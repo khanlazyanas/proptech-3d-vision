@@ -2,11 +2,18 @@
 
 import { useState } from "react";
 import { useEditorStore } from "@/store/useEditorStore";
-import { PaintBucket, Wand2, Calculator, Loader2, Sparkles } from "lucide-react";
+import { PaintBucket, Wand2, Calculator, Loader2, Sparkles, Layers } from "lucide-react";
 import { generateDesignSuggestion } from "@/actions/ai.actions";
 
 export default function Sidebar() {
-  const { wallColor, setWallColor, budget, setBudget, plotSize, aiSuggestion, setAiSuggestion } = useEditorStore();
+  const { 
+    wallColor, setWallColor, 
+    budget, setBudget, 
+    plotSize, 
+    aiSuggestion, setAiSuggestion,
+    floorTexture, setFloorTexture 
+  } = useEditorStore();
+  
   const [isGenerating, setIsGenerating] = useState(false);
 
   const colors = [
@@ -16,11 +23,15 @@ export default function Sidebar() {
     { name: "Slate", hex: "#94a3b8" },
   ];
 
+  const floorTypes = [
+    { id: "marble", name: "Premium Marble" },
+    { id: "wood", name: "Teak Wood" },
+    { id: "concrete", name: "Raw Concrete" },
+  ];
+
   const handleAIGeneration = async () => {
     setIsGenerating(true);
-    // Call our secure Server Action
     const res = await generateDesignSuggestion(budget, wallColor, plotSize);
-    
     if (res.success && res.suggestion) {
       setAiSuggestion(res.suggestion);
     } else {
@@ -39,7 +50,31 @@ export default function Sidebar() {
         <p className="text-sm text-gray-500 mt-1">Customize your {plotSize} layout</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-8">
+      <div className="flex-1 overflow-y-auto p-6 space-y-8 pb-24">
+        
+        {/* Floor Material Selector */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <Layers className="w-4 h-4 text-gray-500" />
+            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Floor Material</h3>
+          </div>
+          <div className="flex flex-col gap-2">
+            {floorTypes.map((floor) => (
+              <button
+                key={floor.id}
+                onClick={() => setFloorTexture(floor.id)}
+                className={`text-left px-4 py-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                  floorTexture === floor.id 
+                    ? "border-indigo-500 bg-indigo-50 text-indigo-700" 
+                    : "border-gray-200 text-gray-600 hover:border-indigo-300"
+                }`}
+              >
+                {floor.name}
+              </button>
+            ))}
+          </div>
+        </section>
+
         {/* Wall Color Changer */}
         <section>
           <div className="flex items-center gap-2 mb-4">
@@ -100,7 +135,7 @@ export default function Sidebar() {
       </div>
 
       {/* Action Button */}
-      <div className="p-6 border-t border-gray-100 bg-gray-50">
+      <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-100 bg-white">
         <button 
           onClick={handleAIGeneration}
           disabled={isGenerating}
