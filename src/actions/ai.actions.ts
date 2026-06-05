@@ -2,8 +2,6 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Initialize Gemini SDK with the API key from .env
-// Note: Ensure you have added GEMINI_API_KEY to your .env file
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function generateDesignSuggestion(budget: number, wallColor: string, plotSize: string) {
@@ -12,8 +10,8 @@ export async function generateDesignSuggestion(budget: number, wallColor: string
       throw new Error("Gemini API key is missing.");
     }
 
-    // Using the fastest model for real-time UI responses
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // UPDATE YAHAN HUA HAI: Google ka sabse latest aur fast model use kar rahe hain
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     
     const prompt = `Act as a premium Indian Interior Architect. 
     The user is designing a ${plotSize} ft narrow plot house.
