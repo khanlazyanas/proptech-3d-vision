@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useEditorStore } from "@/store/useEditorStore";
-import { PaintBucket, Wand2, Calculator, Loader2, Sparkles, Layers } from "lucide-react";
+import { PaintBucket, Wand2, Calculator, Loader2, Sparkles, Layers, Save } from "lucide-react";
 import { generateDesignSuggestion } from "@/actions/ai.actions";
+import { saveProjectDesign } from "@/actions/design.actions";
 
 export default function Sidebar() {
   const { 
@@ -15,6 +16,7 @@ export default function Sidebar() {
   } = useEditorStore();
   
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const colors = [
     { name: "White", hex: "#ffffff" },
@@ -40,8 +42,27 @@ export default function Sidebar() {
     setIsGenerating(false);
   };
 
+  const handleSaveProject = async () => {
+    setIsSaving(true);
+    const res = await saveProjectDesign({
+      plotSize,
+      floorTexture,
+      wallColor,
+      budget,
+      aiSuggestion
+    });
+
+    if (res.success) {
+      alert("Project Saved Successfully! ID: " + res.id);
+    } else {
+      alert("Error saving project.");
+    }
+    setIsSaving(false);
+  };
+
   return (
     <aside className="w-96 h-full bg-white border-l border-gray-200 shadow-xl flex flex-col z-20 relative">
+      {/* Header */}
       <div className="p-6 border-b border-gray-100 bg-gray-50/50">
         <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
           <Wand2 className="w-5 h-5 text-indigo-600" />
@@ -50,7 +71,8 @@ export default function Sidebar() {
         <p className="text-sm text-gray-500 mt-1">Customize your {plotSize} layout</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-8 pb-24">
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-8 pb-32">
         
         {/* Floor Material Selector */}
         <section>
@@ -134,15 +156,24 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* Action Button */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-100 bg-white">
+      {/* Action Buttons at the Bottom */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100 bg-white flex flex-col gap-2">
         <button 
           onClick={handleAIGeneration}
           disabled={isGenerating}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-medium py-3 px-4 rounded-xl shadow-md transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-medium py-2.5 px-4 rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2"
         >
           {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
           {isGenerating ? "Analyzing Space..." : "Generate AI Suggestions"}
+        </button>
+
+        <button 
+          onClick={handleSaveProject}
+          disabled={isSaving}
+          className="w-full bg-white border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 disabled:opacity-50 text-gray-700 font-medium py-2.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2"
+        >
+          {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          {isSaving ? "Saving..." : "Save Project"}
         </button>
       </div>
     </aside>
