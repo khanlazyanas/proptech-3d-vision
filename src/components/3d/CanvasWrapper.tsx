@@ -3,6 +3,7 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
 import FloorPlan from "./FloorPlan";
+import Furniture from "./Furniture"; // Import the new Furniture component
 import { Suspense } from "react";
 
 export default function CanvasWrapper() {
@@ -10,11 +11,9 @@ export default function CanvasWrapper() {
     <div className="w-full h-full min-h-screen bg-gray-50">
       <Canvas
         shadows
-        // Camera ko isometric angle ke liye set kiya hai
         camera={{ position: [40, 40, 40], fov: 35 }} 
       >
         <Suspense fallback={null}>
-          {/* Lighting Setup */}
           <ambientLight intensity={0.5} />
           <directionalLight
             castShadow
@@ -22,18 +21,17 @@ export default function CanvasWrapper() {
             intensity={1.5}
             shadow-mapSize={[1024, 1024]}
           />
-          <Environment preset="city" /> {/* Professional reflection maps */}
+          <Environment preset="city" />
 
-          {/* Core 3D Model */}
+          {/* Core 3D Models */}
           <FloorPlan />
+          <Furniture /> {/* Added furniture to the scene */}
 
-          {/* Shadows niche zameen par aayengi */}
-          <ContactShadows position={[0, -0.5, 0]} opacity={0.5} scale={100} blur={2} />
+          <ContactShadows position={[0, -0.48, 0]} opacity={0.6} scale={100} blur={2.5} />
 
-          {/* Mouse se zoom aur rotate karne ke controls */}
           <OrbitControls 
             makeDefault 
-            maxPolarAngle={Math.PI / 2 - 0.05} // Zameen ke niche dekhna block kiya hai
+            maxPolarAngle={Math.PI / 2 - 0.05}
             minDistance={20}
             maxDistance={150}
           />
