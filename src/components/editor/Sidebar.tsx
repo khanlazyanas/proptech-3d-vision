@@ -1,10 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { useEditorStore } from "@/store/useEditorStore";
-import { PaintBucket, Wand2, Calculator } from "lucide-react";
+import { PaintBucket, Wand2, Calculator, Loader2, Sparkles } from "lucide-react";
+import { generateDesignSuggestion } from "@/actions/ai.actions";
 
 export default function Sidebar() {
-  const { wallColor, setWallColor, budget, setBudget } = useEditorStore();
+  const { wallColor, setWallColor, budget, setBudget, plotSize, aiSuggestion, setAiSuggestion } = useEditorStore();
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const colors = [
     { name: "White", hex: "#ffffff" },
@@ -13,14 +16,27 @@ export default function Sidebar() {
     { name: "Slate", hex: "#94a3b8" },
   ];
 
+  const handleAIGeneration = async () => {
+    setIsGenerating(true);
+    // Call our secure Server Action
+    const res = await generateDesignSuggestion(budget, wallColor, plotSize);
+    
+    if (res.success && res.suggestion) {
+      setAiSuggestion(res.suggestion);
+    } else {
+      setAiSuggestion("Could not generate suggestions at this time.");
+    }
+    setIsGenerating(false);
+  };
+
   return (
-    <aside className="w-80 h-full bg-white border-l border-gray-200 shadow-xl flex flex-col z-20 relative">
+    <aside className="w-96 h-full bg-white border-l border-gray-200 shadow-xl flex flex-col z-20 relative">
       <div className="p-6 border-b border-gray-100 bg-gray-50/50">
         <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
           <Wand2 className="w-5 h-5 text-indigo-600" />
           Design Studio
         </h2>
-        <p className="text-sm text-gray-500 mt-1">Customize your 20x70 layout</p>
+        <p className="text-sm text-gray-500 mt-1">Customize your {plotSize} layout</p>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-8">
@@ -70,13 +86,28 @@ export default function Sidebar() {
             </div>
           </div>
         </section>
+
+        {/* AI Suggestion Output Box */}
+        {aiSuggestion && (
+          <section className="bg-indigo-50 border border-indigo-100 p-4 rounded-xl">
+            <div className="flex items-center gap-2 mb-2 text-indigo-700">
+              <Sparkles className="w-4 h-4" />
+              <h3 className="font-bold text-sm">AI Architect Suggestion</h3>
+            </div>
+            <p className="text-sm text-indigo-900 leading-relaxed">{aiSuggestion}</p>
+          </section>
+        )}
       </div>
 
       {/* Action Button */}
       <div className="p-6 border-t border-gray-100 bg-gray-50">
-        <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl shadow-md transition-colors flex items-center justify-center gap-2">
-          <Wand2 className="w-4 h-4" />
-          Generate AI Suggestions
+        <button 
+          onClick={handleAIGeneration}
+          disabled={isGenerating}
+          className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-medium py-3 px-4 rounded-xl shadow-md transition-colors flex items-center justify-center gap-2"
+        >
+          {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
+          {isGenerating ? "Analyzing Space..." : "Generate AI Suggestions"}
         </button>
       </div>
     </aside>
