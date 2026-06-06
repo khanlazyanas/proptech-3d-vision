@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useEditorStore } from "@/store/useEditorStore";
 import { PaintBucket, Wand2, Calculator, Loader2, Sparkles, Layers, Save, Ruler } from "lucide-react";
 import { generateDesignSuggestion } from "@/actions/ai.actions";
@@ -11,13 +11,38 @@ export default function Sidebar() {
   const { 
     wallColor, setWallColor, 
     budget, setBudget, 
-    plotSize, setPlotSize, // Yahan setPlotSize nikal liya
+    plotSize, setPlotSize, 
     aiSuggestion, setAiSuggestion,
     floorTexture, setFloorTexture 
   } = useEditorStore();
   
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Local state for custom typing inputs
+  const [wStr, lStr] = plotSize.split("x");
+  const [customW, setCustomW] = useState(wStr || "20");
+  const [customL, setCustomL] = useState(lStr || "70");
+
+  // Sync inputs if plotSize changes from somewhere else
+  useEffect(() => {
+    const [w, l] = plotSize.split("x");
+    setCustomW(w);
+    setCustomL(l);
+  }, [plotSize]);
+
+  const handleSizeUpdate = () => {
+    const w = parseInt(customW);
+    const l = parseInt(customL);
+    // Boundary check (Minimum 10x10)
+    if (w >= 10 && l >= 10) {
+      setPlotSize(`${w}x${l}`);
+    } else {
+      toast.error("Minimum plot size should be 10x10 ft");
+      setCustomW(wStr);
+      setCustomL(lStr);
+    }
+  };
 
   const colors = [
     { name: "White", hex: "#ffffff" },
@@ -31,9 +56,6 @@ export default function Sidebar() {
     { id: "wood", name: "Teak Wood" },
     { id: "concrete", name: "Raw Concrete" },
   ];
-
-  // Professional Standard Indian Plot Sizes (in feet)
-  const availablePlotSizes = ["20x70", "30x40", "30x50", "40x60", "50x100"];
 
   const handleAIGeneration = async () => {
     setIsGenerating(true);
@@ -74,29 +96,39 @@ export default function Sidebar() {
 
       <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 md:space-y-8 pb-36">
         
-        {/* ================= NAYA SECTION: PLOT DIMENSIONS ================= */}
+        {/* ================= CUSTOM PLOT SIZE INPUT ================= */}
         <section>
           <div className="flex items-center gap-2 mb-3">
             <Ruler className="w-4 h-4 text-gray-500" />
             <h3 className="text-xs md:text-sm font-semibold text-gray-700 uppercase tracking-wider">Plot Dimensions (Ft)</h3>
           </div>
-          <div className="grid grid-cols-3 gap-2">
-            {availablePlotSizes.map((size) => (
-              <button
-                key={size}
-                onClick={() => setPlotSize(size)}
-                className={`py-2 rounded-lg border-2 transition-all text-xs font-bold ${
-                  plotSize === size 
-                    ? "border-indigo-500 bg-indigo-50 text-indigo-700" 
-                    : "border-gray-200 text-gray-500 hover:border-indigo-300 hover:text-indigo-600"
-                }`}
-              >
-                {size}
-              </button>
-            ))}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl flex items-center px-3 py-2.5 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-200 transition-all">
+              <span className="text-gray-400 text-xs font-semibold mr-2 uppercase">W</span>
+              <input 
+                type="number" 
+                value={customW} 
+                onChange={(e) => setCustomW(e.target.value)} 
+                onBlur={handleSizeUpdate}
+                onKeyDown={(e) => e.key === 'Enter' && handleSizeUpdate()}
+                className="w-full bg-transparent outline-none text-gray-800 font-bold text-center" 
+              />
+            </div>
+            <span className="text-gray-400 font-bold">×</span>
+            <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl flex items-center px-3 py-2.5 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-200 transition-all">
+              <span className="text-gray-400 text-xs font-semibold mr-2 uppercase">L</span>
+              <input 
+                type="number" 
+                value={customL} 
+                onChange={(e) => setCustomL(e.target.value)} 
+                onBlur={handleSizeUpdate}
+                onKeyDown={(e) => e.key === 'Enter' && handleSizeUpdate()}
+                className="w-full bg-transparent outline-none text-gray-800 font-bold text-center" 
+              />
+            </div>
           </div>
+          <p className="text-[10px] text-gray-400 mt-2 text-center uppercase tracking-wide">Type size and press Enter</p>
         </section>
-        {/* ================================================================ */}
 
         {/* Floor Material Selector */}
         <section>
@@ -168,6 +200,7 @@ export default function Sidebar() {
           </div>
         </section>
 
+        {/* AI Suggestion Output Box */}
         {aiSuggestion && (
           <section className="bg-indigo-50 border border-indigo-100 p-3 md:p-4 rounded-xl">
             <div className="flex items-center gap-2 mb-2 text-indigo-700">
