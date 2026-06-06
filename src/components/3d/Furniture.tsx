@@ -2,30 +2,29 @@
 
 export default function Furniture() {
   return (
-    <group position={[0, 0, -25]}> {/* Bed ko deewar ke paas place kiya hai */}
+    // Bed ko piche wale Master Bedroom (Z = -25, X = 2) me perfect locate kiya hai
+    <group position={[2, 0, -26]} rotation={[0, 0, 0]}> 
       
-      {/* Bed Frame (Wooden Base) */}
-      <mesh castShadow receiveShadow position={[0, 0.5, 0]}>
-        <boxGeometry args={[12, 1, 16]} /> {/* 12ft wide, 16ft long proportion */}
-        <meshStandardMaterial color="#3E2723" roughness={0.8} />
+      {/* Bed Wooden Base */}
+      <mesh castShadow receiveShadow position={[0, 0.4, 0]}>
+        <boxGeometry args={[10, 0.8, 12]} />
+        <meshStandardMaterial color="#4a2c11" roughness={0.7} />
       </mesh>
 
-      {/* Mattress (White/Cream) */}
-      <mesh castShadow receiveShadow position={[0, 1.25, 0]}>
-        <boxGeometry args={[11, 0.5, 15]} />
-        <meshStandardMaterial color="#f8f9fa" roughness={0.9} />
+      {/* Luxury Mattress */}
+      <mesh castShadow receiveShadow position={[0, 1, 0]}>
+        <boxGeometry args={[9.5, 0.5, 11.5]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
       </mesh>
 
-      {/* Pillow 1 */}
-      <mesh castShadow receiveShadow position={[-2.5, 1.6, -6]}>
-        <boxGeometry args={[3, 0.3, 2]} />
-        <meshStandardMaterial color="#e2e8f0" roughness={1} />
+      {/* Pillows */}
+      <mesh castShadow receiveShadow position={[-2, 1.3, -4.5]}>
+        <boxGeometry args={[2.5, 0.2, 1.8]} />
+        <meshStandardMaterial color="#cbd5e1" roughness={1} />
       </mesh>
-
-      {/* Pillow 2 */}
-      <mesh castShadow receiveShadow position={[2.5, 1.6, -6]}>
-        <boxGeometry args={[3, 0.3, 2]} />
-        <meshStandardMaterial color="#e2e8f0" roughness={1} />
+      <mesh castShadow receiveShadow position={[2, 1.3, -4.5]}>
+        <boxGeometry args={[2.5, 0.2, 1.8]} />
+        <meshStandardMaterial color="#cbd5e1" roughness={1} />
       </mesh>
       
     </group>
