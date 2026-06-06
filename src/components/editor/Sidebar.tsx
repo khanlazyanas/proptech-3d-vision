@@ -5,6 +5,7 @@ import { useEditorStore } from "@/store/useEditorStore";
 import { PaintBucket, Wand2, Calculator, Loader2, Sparkles, Layers, Save } from "lucide-react";
 import { generateDesignSuggestion } from "@/actions/ai.actions";
 import { saveProjectDesign } from "@/actions/design.actions";
+import toast from "react-hot-toast"; // Naya import toast notifications ke liye
 
 export default function Sidebar() {
   const { 
@@ -42,26 +43,32 @@ export default function Sidebar() {
     setIsGenerating(false);
   };
 
+  // UPDATED: Ab ye alerts ki jagah professional animated promise handle karega
   const handleSaveProject = async () => {
     setIsSaving(true);
-    const res = await saveProjectDesign({
-      plotSize,
-      floorTexture,
-      wallColor,
-      budget,
-      aiSuggestion
+    
+    toast.promise(
+      saveProjectDesign({
+        plotSize,
+        floorTexture,
+        wallColor,
+        budget,
+        aiSuggestion
+      }),
+      {
+        loading: 'Saving your design to cloud...',
+        success: (res) => {
+          if (!res.success) throw new Error("Backend failed");
+          return `Design saved successfully!`;
+        },
+        error: 'Failed to save project. Please check your database connection.',
+      }
+    ).finally(() => {
+      setIsSaving(false);
     });
-
-    if (res.success) {
-      alert("Project Saved Successfully! ID: " + res.id);
-    } else {
-      alert("Error saving project.");
-    }
-    setIsSaving(false);
   };
 
   return (
-    // FULLY RESPONSIVE WRAPPER
     <aside className="w-full md:w-96 h-[50vh] md:h-full bg-white border-t md:border-t-0 md:border-l border-gray-200 shadow-xl flex flex-col z-20 relative">
       
       {/* Header */}
