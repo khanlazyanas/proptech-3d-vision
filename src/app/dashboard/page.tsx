@@ -2,12 +2,11 @@ import { connectToDatabase } from "@/lib/db";
 import SavedDesign from "@/models/SavedDesign";
 import Link from "next/link";
 import { ArrowLeft, Building2, Calendar, IndianRupee, Layers, PaintBucket } from "lucide-react";
+import DeleteButton from "@/components/dashboard/DeleteButton"; // Import Client Component
 
-// Server Component - Fetches data directly from MongoDB securely
 async function getSavedProjects() {
   try {
     await connectToDatabase();
-    // Fetch all designs, sorted by newest first
     const projects = await SavedDesign.find({}).sort({ createdAt: -1 }).lean();
     return projects;
   } catch (error) {
@@ -23,7 +22,6 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-gray-50/50 p-8 font-sans">
       <div className="max-w-7xl mx-auto space-y-8">
         
-        {/* Header Section */}
         <header className="flex items-center justify-between bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
           <div>
             <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">My Saved Projects</h1>
@@ -38,7 +36,6 @@ export default async function DashboardPage() {
           </Link>
         </header>
 
-        {/* Projects Grid */}
         {projects.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 border-dashed">
             <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
@@ -51,13 +48,17 @@ export default async function DashboardPage() {
               <div key={project._id.toString()} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow group flex flex-col">
                 
                 <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-bold text-gray-800 group-hover:text-indigo-600 transition-colors">
-                    {project.projectName}
-                  </h3>
-                  <span className="text-xs font-semibold bg-gray-100 text-gray-600 px-3 py-1 rounded-full flex items-center gap-1">
-                    <Calendar className="w-3 h-3" />
-                    {new Date(project.createdAt).toLocaleDateString()}
-                  </span>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-800 group-hover:text-indigo-600 transition-colors">
+                      {project.projectName}
+                    </h3>
+                    <span className="text-xs font-semibold text-gray-500 flex items-center gap-1 mt-1">
+                      <Calendar className="w-3 h-3" />
+                      {new Date(project.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                  {/* YAHAN HUMNE DELETE BUTTON ADD KIYA HAI */}
+                  <DeleteButton id={project._id.toString()} />
                 </div>
 
                 <div className="space-y-3 flex-1">

@@ -10,7 +10,6 @@ export async function generateDesignSuggestion(budget: number, wallColor: string
       throw new Error("Gemini API key is missing.");
     }
 
-    // UPDATE YAHAN HUA HAI: Google ka sabse latest aur fast model use kar rahe hain
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
     
     const prompt = `Act as a premium Indian Interior Architect. 
