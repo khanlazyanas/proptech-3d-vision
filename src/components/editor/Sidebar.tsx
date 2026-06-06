@@ -2,16 +2,16 @@
 
 import { useState } from "react";
 import { useEditorStore } from "@/store/useEditorStore";
-import { PaintBucket, Wand2, Calculator, Loader2, Sparkles, Layers, Save } from "lucide-react";
+import { PaintBucket, Wand2, Calculator, Loader2, Sparkles, Layers, Save, Ruler } from "lucide-react";
 import { generateDesignSuggestion } from "@/actions/ai.actions";
 import { saveProjectDesign } from "@/actions/design.actions";
-import toast from "react-hot-toast"; // Naya import toast notifications ke liye
+import toast from "react-hot-toast";
 
 export default function Sidebar() {
   const { 
     wallColor, setWallColor, 
     budget, setBudget, 
-    plotSize, 
+    plotSize, setPlotSize, // Yahan setPlotSize nikal liya
     aiSuggestion, setAiSuggestion,
     floorTexture, setFloorTexture 
   } = useEditorStore();
@@ -32,6 +32,9 @@ export default function Sidebar() {
     { id: "concrete", name: "Raw Concrete" },
   ];
 
+  // Professional Standard Indian Plot Sizes (in feet)
+  const availablePlotSizes = ["20x70", "30x40", "30x50", "40x60", "50x100"];
+
   const handleAIGeneration = async () => {
     setIsGenerating(true);
     const res = await generateDesignSuggestion(budget, wallColor, plotSize);
@@ -43,46 +46,58 @@ export default function Sidebar() {
     setIsGenerating(false);
   };
 
-  // UPDATED: Ab ye alerts ki jagah professional animated promise handle karega
   const handleSaveProject = async () => {
     setIsSaving(true);
-    
     toast.promise(
-      saveProjectDesign({
-        plotSize,
-        floorTexture,
-        wallColor,
-        budget,
-        aiSuggestion
-      }),
+      saveProjectDesign({ plotSize, floorTexture, wallColor, budget, aiSuggestion }),
       {
         loading: 'Saving your design to cloud...',
         success: (res) => {
           if (!res.success) throw new Error("Backend failed");
           return `Design saved successfully!`;
         },
-        error: 'Failed to save project. Please check your database connection.',
+        error: 'Failed to save project.',
       }
-    ).finally(() => {
-      setIsSaving(false);
-    });
+    ).finally(() => setIsSaving(false));
   };
 
   return (
     <aside className="w-full md:w-96 h-[50vh] md:h-full bg-white border-t md:border-t-0 md:border-l border-gray-200 shadow-xl flex flex-col z-20 relative">
       
-      {/* Header */}
       <div className="p-4 md:p-6 border-b border-gray-100 bg-gray-50/50 shrink-0">
         <h2 className="text-lg md:text-xl font-bold text-gray-800 flex items-center gap-2">
           <Wand2 className="w-5 h-5 text-indigo-600" />
           Design Studio
         </h2>
-        <p className="text-xs md:text-sm text-gray-500 mt-1 hidden md:block">Customize your {plotSize} layout</p>
+        <p className="text-xs md:text-sm text-gray-500 mt-1 hidden md:block">Interactive Property Configurator</p>
       </div>
 
-      {/* Scrollable Content Area */}
       <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 md:space-y-8 pb-36">
         
+        {/* ================= NAYA SECTION: PLOT DIMENSIONS ================= */}
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <Ruler className="w-4 h-4 text-gray-500" />
+            <h3 className="text-xs md:text-sm font-semibold text-gray-700 uppercase tracking-wider">Plot Dimensions (Ft)</h3>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {availablePlotSizes.map((size) => (
+              <button
+                key={size}
+                onClick={() => setPlotSize(size)}
+                className={`py-2 rounded-lg border-2 transition-all text-xs font-bold ${
+                  plotSize === size 
+                    ? "border-indigo-500 bg-indigo-50 text-indigo-700" 
+                    : "border-gray-200 text-gray-500 hover:border-indigo-300 hover:text-indigo-600"
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        </section>
+        {/* ================================================================ */}
+
         {/* Floor Material Selector */}
         <section>
           <div className="flex items-center gap-2 mb-3">
@@ -153,7 +168,6 @@ export default function Sidebar() {
           </div>
         </section>
 
-        {/* AI Suggestion Output Box */}
         {aiSuggestion && (
           <section className="bg-indigo-50 border border-indigo-100 p-3 md:p-4 rounded-xl">
             <div className="flex items-center gap-2 mb-2 text-indigo-700">
@@ -165,7 +179,7 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* Action Buttons at the Bottom */}
+      {/* Action Buttons */}
       <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 border-t border-gray-100 bg-white flex flex-col gap-2 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <button 
           onClick={handleAIGeneration}
@@ -173,7 +187,7 @@ export default function Sidebar() {
           className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-medium py-2 md:py-2.5 px-4 rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2 text-sm md:text-base"
         >
           {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
-          {isGenerating ? "Analyzing Space..." : "Generate AI Suggestions"}
+          {isGenerating ? "Analyzing Layout..." : "Generate AI Suggestions"}
         </button>
 
         <button 
