@@ -4,6 +4,12 @@ import Link from "next/link";
 import { ArrowLeft, Building2, Calendar, IndianRupee, Layers, PaintBucket } from "lucide-react";
 import DeleteButton from "@/components/dashboard/DeleteButton"; // Import Client Component
 
+// ================= THE MAGIC FIX =================
+// Ye line Next.js ko force karti hai ki page ko build time par render na kare.
+// Vercel build ab crash nahi hogi kyunki DB call sirf actual page visit par hogi.
+export const dynamic = "force-dynamic";
+// =================================================
+
 async function getSavedProjects() {
   try {
     await connectToDatabase();
