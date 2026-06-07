@@ -6,6 +6,7 @@ import FloorPlan from "./FloorPlan";
 import Furniture from "./Furniture"; 
 import Kitchen from "./Kitchen";
 import LivingRoom from "./LivingRoom";
+import Bathroom from "./Bathroom"; 
 import Toolbar from "./Toolbar"; // Toolbar import kiya
 import { useEditorStore } from "@/store/useEditorStore";
 import { Suspense } from "react";
@@ -61,6 +62,7 @@ export default function CanvasWrapper() {
           <Furniture />
           <Kitchen />
           <LivingRoom />
+          <Bathroom/>
 
           {/* Shadows */}
           <ContactShadows 
