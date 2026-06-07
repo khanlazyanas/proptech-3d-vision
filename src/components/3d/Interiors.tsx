@@ -38,12 +38,12 @@ export default function Interiors() {
         position={pos}
         rotation={[-Math.PI / 2, 0, 0]}
         fontSize={width > 30 ? 1.5 : 1.1}
-        color="rgba(148, 163, 184, 0.4)"  // ✅ Replaced opacity with RGBA color
+        color="rgba(148, 163, 184, 0.4)"
         anchorX="center"
         anchorY="middle"
         letterSpacing={0.15}
         fontWeight="900"
-        depthTest={false}
+        // depthTest removed – not a valid prop for Text
       >
         {`${name.toUpperCase()}\n${Math.round(w)}' x ${Math.round(l)}'`}
       </Text>
@@ -52,7 +52,7 @@ export default function Interiors() {
 
   // ================= ULTRA-REALISTIC DOOR COMPONENT =================
   const ArchitecturalDoor = ({ pos, rotation = [0, 0, 0], swingInvert = false }: { pos: [number, number, number], rotation?: [number, number, number], swingInvert?: boolean }) => {
-    const swingAngle = swingInvert ? -Math.PI / 2.5 : Math.PI / 2.5; // 72 degrees open
+    const swingAngle = swingInvert ? -Math.PI / 2.5 : Math.PI / 2.5;
     const hingeX = swingInvert ? 1.4 : -1.4;
 
     return (
