@@ -16,10 +16,10 @@ export default function Interiors() {
   const dBed = length * 0.25;
   const dBalc = length * 0.10;
 
-  const w1 = zFront - dPark; 
-  const w2 = w1 - dLiv;      
-  const w3 = w2 - dKit;      
-  const w4 = w3 - dBed;      
+  const w1 = zFront - dPark;
+  const w2 = w1 - dLiv;
+  const w3 = w2 - dKit;
+  const w4 = w3 - dBed;
 
   const cPark = zFront - dPark / 2;
   const cLiv = w1 - dLiv / 2;
@@ -38,10 +38,9 @@ export default function Interiors() {
         position={pos}
         rotation={[-Math.PI / 2, 0, 0]}
         fontSize={width > 30 ? 1.5 : 1.1}
-        color="#94a3b8"
+        color="rgba(148, 163, 184, 0.4)"  // ✅ Replaced opacity with RGBA color
         anchorX="center"
         anchorY="middle"
-        opacity={0.4}
         letterSpacing={0.15}
         fontWeight="900"
         depthTest={false}
