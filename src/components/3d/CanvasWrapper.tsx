@@ -3,11 +3,8 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
 import FloorPlan from "./FloorPlan";
-import Furniture from "./Furniture"; 
-import Kitchen from "./Kitchen";
-import LivingRoom from "./LivingRoom";
-import Bathroom from "./Bathroom"; 
-import Toolbar from "./Toolbar"; // Toolbar import kiya
+import Interiors from "./Interiors"; // NAYA MASTER ENGINE IMPORT KIYA
+import Toolbar from "./Toolbar"; 
 import { useEditorStore } from "@/store/useEditorStore";
 import { Suspense } from "react";
 
@@ -24,20 +21,20 @@ export default function CanvasWrapper() {
         shadows
         // IMPORTANT: Ye export/download feature ko enable karta hai
         gl={{ preserveDrawingBuffer: true, antialias: true }} 
-        camera={{ position: [50, 50, 50], fov: 35 }} 
+        camera={{ position: [0, 60, 80], fov: 40 }} // Camera angle better view ke liye set kiya hai
       >
         {/* Dynamic Background Color based on Theme */}
         <color attach="background" args={[lightingTheme === 'night' ? '#0f172a' : '#f8fafc']} />
 
         <Suspense fallback={null}>
           {/* Dynamic Cinematic Lighting */}
-          <ambientLight intensity={lightingTheme === 'night' ? 0.2 : 0.6} />
+          <ambientLight intensity={lightingTheme === 'night' ? 0.1 : 0.6} />
           
           {lightingTheme === 'day' && (
             <directionalLight
               castShadow
               position={[30, 50, 20]}
-              intensity={1.8}
+              intensity={1.5}
               shadow-mapSize={[2048, 2048]}
               shadow-camera-far={100}
               shadow-camera-left={-50}
@@ -47,22 +44,14 @@ export default function CanvasWrapper() {
             />
           )}
 
-          {/* Night time studio lighting (Spotlights inside the house) */}
-          {lightingTheme === 'night' && (
-            <>
-              <spotLight position={[0, 20, 0]} intensity={2} color="#fcd34d" angle={0.8} penumbra={1} castShadow />
-              <pointLight position={[-15, 10, -15]} intensity={1.5} color="#e0f2fe" distance={30} />
-            </>
-          )}
-
           <Environment preset={lightingTheme === 'night' ? 'night' : 'city'} />
 
-          {/* Architecture & Interiors */}
+          {/* ==================================================== */}
+          {/* THE UNIFIED ARCHITECTURE & INTERIORS */}
+          {/* Purane 4 files hata kar ab sirf ye do files hain */}
           <FloorPlan />
-          <Furniture />
-          <Kitchen />
-          <LivingRoom />
-          <Bathroom/>
+          <Interiors />
+          {/* ==================================================== */}
 
           {/* Shadows */}
           <ContactShadows 
