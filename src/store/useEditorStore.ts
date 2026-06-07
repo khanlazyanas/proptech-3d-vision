@@ -1,32 +1,33 @@
 import { create } from 'zustand';
 
-// Strictly typed interface for our 3D Property Editor
 interface EditorState {
   plotSize: string;
   floorTexture: string;
   wallColor: string;
   budget: number;
   aiSuggestion: string | null;
+  lightingTheme: 'day' | 'night'; // NAYA FEATURE
   
-  // Actions to update the state
   setPlotSize: (size: string) => void;
   setFloorTexture: (texture: string) => void;
   setWallColor: (color: string) => void;
   setBudget: (budget: number) => void;
   setAiSuggestion: (suggestion: string | null) => void;
+  setLightingTheme: (theme: 'day' | 'night') => void; // NAYA FEATURE
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
-  // Default values set to an optimal standard layout for our 3D architectural renders
-  plotSize: '20x70', 
-  floorTexture: 'marble_light',
+  plotSize: '30x50', 
+  floorTexture: 'marble',
   wallColor: '#ffffff',
   budget: 500000,
   aiSuggestion: null,
+  lightingTheme: 'day',
 
   setPlotSize: (size) => set({ plotSize: size }),
   setFloorTexture: (texture) => set({ floorTexture: texture }),
   setWallColor: (color) => set({ wallColor: color }),
   setBudget: (budget) => set({ budget }),
   setAiSuggestion: (suggestion) => set({ aiSuggestion: suggestion }),
+  setLightingTheme: (theme) => set({ lightingTheme: theme }),
 }));
