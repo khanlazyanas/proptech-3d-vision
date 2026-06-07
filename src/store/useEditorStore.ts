@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 
+export type LayoutType = 'studio' | '1bhk' | '2bhk';
+
 interface EditorState {
   plotSize: string;
   floorTexture: string;
@@ -7,7 +9,8 @@ interface EditorState {
   budget: number;
   aiSuggestion: string | null;
   lightingTheme: 'day' | 'night';
-  showRoof: boolean; // NAYA FEATURE: Roof Toggle
+  showRoof: boolean;
+  layoutType: LayoutType; // NAYA FEATURE
   
   setPlotSize: (size: string) => void;
   setFloorTexture: (texture: string) => void;
@@ -15,7 +18,8 @@ interface EditorState {
   setBudget: (budget: number) => void;
   setAiSuggestion: (suggestion: string | null) => void;
   setLightingTheme: (theme: 'day' | 'night') => void;
-  setShowRoof: (show: boolean) => void; // NAYA FEATURE
+  setShowRoof: (show: boolean) => void;
+  setLayoutType: (type: LayoutType) => void; // NAYA FEATURE
 }
 
 export const useEditorStore = create<EditorState>((set) => ({
@@ -25,7 +29,8 @@ export const useEditorStore = create<EditorState>((set) => ({
   budget: 500000,
   aiSuggestion: null,
   lightingTheme: 'day',
-  showRoof: false, // By default chhat open rakhenge taaki andar ka design dikhe
+  showRoof: false,
+  layoutType: '1bhk', // Default 1 BHK layout
 
   setPlotSize: (size) => set({ plotSize: size }),
   setFloorTexture: (texture) => set({ floorTexture: texture }),
@@ -34,4 +39,5 @@ export const useEditorStore = create<EditorState>((set) => ({
   setAiSuggestion: (suggestion) => set({ aiSuggestion: suggestion }),
   setLightingTheme: (theme) => set({ lightingTheme: theme }),
   setShowRoof: (show) => set({ showRoof: show }),
+  setLayoutType: (type) => set({ layoutType: type }),
 }));

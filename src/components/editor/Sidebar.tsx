@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useEditorStore } from "@/store/useEditorStore";
-import { PaintBucket, Wand2, Calculator, Loader2, Sparkles, Layers, Save, Ruler } from "lucide-react";
+import { useEditorStore, LayoutType } from "@/store/useEditorStore";
+import { PaintBucket, Wand2, Calculator, Loader2, Sparkles, Layers, Save, Ruler, Home } from "lucide-react";
 import { generateDesignSuggestion } from "@/actions/ai.actions";
 import { saveProjectDesign } from "@/actions/design.actions";
 import toast from "react-hot-toast";
@@ -13,7 +13,8 @@ export default function Sidebar() {
     budget, setBudget, 
     plotSize, setPlotSize, 
     aiSuggestion, setAiSuggestion,
-    floorTexture, setFloorTexture 
+    floorTexture, setFloorTexture,
+    layoutType, setLayoutType // NAYA: Store se layout type destructure kiya
   } = useEditorStore();
   
   const [isGenerating, setIsGenerating] = useState(false);
@@ -34,11 +35,11 @@ export default function Sidebar() {
   const handleSizeUpdate = () => {
     const w = parseInt(customW);
     const l = parseInt(customL);
-    // Boundary check (Minimum 10x10)
-    if (w >= 10 && l >= 10) {
+    // Boundary check (Minimum 15x20 for proper layouts)
+    if (w >= 15 && l >= 20) {
       setPlotSize(`${w}x${l}`);
     } else {
-      toast.error("Minimum plot size should be 10x10 ft");
+      toast.error("Minimum plot size should be 15x20 ft");
       setCustomW(wStr);
       setCustomL(lStr);
     }
@@ -57,9 +58,18 @@ export default function Sidebar() {
     { id: "concrete", name: "Raw Concrete" },
   ];
 
+  // NAYA: Layout configurations
+  const layouts: { id: LayoutType; name: string }[] = [
+    { id: "studio", name: "Studio Open" },
+    { id: "1bhk", name: "1 BHK Standard" },
+    { id: "2bhk", name: "2 BHK Family" },
+  ];
+
   const handleAIGeneration = async () => {
     setIsGenerating(true);
-    const res = await generateDesignSuggestion(budget, wallColor, plotSize);
+    // NAYA: Prompt context me layout type add kiya for better AI suggestions
+    const promptContext = `${plotSize} plot with ${layoutType} layout`;
+    const res = await generateDesignSuggestion(budget, wallColor, promptContext);
     if (res.success && res.suggestion) {
       setAiSuggestion(res.suggestion);
     } else {
@@ -96,6 +106,29 @@ export default function Sidebar() {
 
       <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 md:space-y-8 pb-36">
         
+        {/* ================= NAYA SECTION: ARCHITECTURE LAYOUT ================= */}
+        <section>
+          <div className="flex items-center gap-2 mb-3">
+            <Home className="w-4 h-4 text-gray-500" />
+            <h3 className="text-xs md:text-sm font-semibold text-gray-700 uppercase tracking-wider">Floor Plan</h3>
+          </div>
+          <div className="flex flex-col gap-2">
+            {layouts.map((layout) => (
+              <button
+                key={layout.id}
+                onClick={() => setLayoutType(layout.id)}
+                className={`text-left px-3 py-2 md:px-4 md:py-3 rounded-lg border-2 transition-all text-sm font-bold ${
+                  layoutType === layout.id 
+                    ? "border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm" 
+                    : "border-gray-200 text-gray-600 hover:border-indigo-300 hover:bg-gray-50"
+                }`}
+              >
+                {layout.name}
+              </button>
+            ))}
+          </div>
+        </section>
+
         {/* ================= CUSTOM PLOT SIZE INPUT ================= */}
         <section>
           <div className="flex items-center gap-2 mb-3">

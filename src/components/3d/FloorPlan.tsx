@@ -4,7 +4,7 @@ import { useEditorStore } from "@/store/useEditorStore";
 import { Grid } from "@react-three/drei";
 
 export default function FloorPlan() {
-  const { wallColor, floorTexture, plotSize, showRoof } = useEditorStore();
+  const { wallColor, floorTexture, plotSize, showRoof, layoutType } = useEditorStore();
 
   const [wStr, lStr] = plotSize.split("x");
   const width = parseInt(wStr) || 20;
@@ -24,12 +24,7 @@ export default function FloorPlan() {
 
   return (
     <group>
-      <Grid 
-        position={[0, -0.49, 0]} args={[width + 40, length + 40]} 
-        cellSize={1} cellThickness={1} cellColor="#cbd5e1" 
-        sectionSize={5} sectionThickness={1.5} sectionColor="#6366f1" 
-        fadeDistance={Math.max(width, length) + 40} 
-      />
+      <Grid position={[0, -0.49, 0]} args={[width + 40, length + 40]} cellSize={1} cellThickness={1} cellColor="#cbd5e1" sectionSize={5} sectionThickness={1.5} sectionColor="#6366f1" fadeDistance={Math.max(width, length) + 40} />
 
       {/* Main Floor Slab */}
       <mesh receiveShadow position={[0, -0.5, 0]}>
@@ -37,39 +32,43 @@ export default function FloorPlan() {
         <meshStandardMaterial {...floorMat} />
       </mesh>
 
-      {/* ================= DYNAMIC ROOF ================= */}
+      {/* Roof */}
       {showRoof && (
         <mesh castShadow receiveShadow position={[0, 6.2, 0]}>
           <boxGeometry args={[width + 1, 0.4, length + 1]} />
-          {/* Concrete Roof Slab */}
           <meshStandardMaterial color="#e2e8f0" roughness={0.9} />
         </mesh>
       )}
 
-      {/* ================= BOUNDARY WALLS ================= */}
+      {/* BOUNDARY WALLS */}
       <mesh castShadow receiveShadow position={[-width / 2 + 0.25, 3, 0]}><boxGeometry args={[0.5, 6, length]} /><meshStandardMaterial color={wallColor} roughness={0.9} /></mesh>
       <mesh castShadow receiveShadow position={[width / 2 - 0.25, 3, 0]}><boxGeometry args={[0.5, 6, length]} /><meshStandardMaterial color={wallColor} roughness={0.9} /></mesh>
       <mesh castShadow receiveShadow position={[0, 3, -length / 2 + 0.25]}><boxGeometry args={[width, 6, 0.5]} /><meshStandardMaterial color={wallColor} roughness={0.9} /></mesh>
       <mesh castShadow receiveShadow position={[-width * 0.15, 3, length / 2 - 0.25]}><boxGeometry args={[width * 0.7, 6, 0.5]} /><meshStandardMaterial color={wallColor} roughness={0.9} /></mesh>
 
-      {/* ================= INTERIOR PARTITIONS ================= */}
-      <mesh castShadow receiveShadow position={[width * 0.15, 3, bedRoomEnd]}><boxGeometry args={[width * 0.7, 6, 0.4]} /><meshStandardMaterial color={wallColor} roughness={0.9} /></mesh>
-      <mesh castShadow receiveShadow position={[-width * 0.15, 3, kitchenEnd]}><boxGeometry args={[width * 0.7, 6, 0.4]} /><meshStandardMaterial color={wallColor} roughness={0.9} /></mesh>
+      {/* ================= DYNAMIC LAYOUT ENGINE ================= */}
+      
+      {/* Show these dividers ONLY if NOT a Studio */}
+      {layoutType !== 'studio' && (
+        <>
+          <mesh castShadow receiveShadow position={[width * 0.15, 3, bedRoomEnd]}><boxGeometry args={[width * 0.7, 6, 0.4]} /><meshStandardMaterial color={wallColor} roughness={0.9} /></mesh>
+          <mesh castShadow receiveShadow position={[-width * 0.15, 3, kitchenEnd]}><boxGeometry args={[width * 0.7, 6, 0.4]} /><meshStandardMaterial color={wallColor} roughness={0.9} /></mesh>
+        </>
+      )}
 
-      {/* NAYA: BATHROOM PARTITION (Back-Left Corner in Bedroom) */}
+      {/* 2 BHK Feature: Split the bedroom zone in half vertically */}
+      {layoutType === '2bhk' && (
+        <mesh castShadow receiveShadow position={[0, 3, -(length / 2) + (length * 0.35) / 2]}>
+          <boxGeometry args={[0.4, 6, length * 0.35]} />
+          <meshStandardMaterial color={wallColor} roughness={0.9} />
+        </mesh>
+      )}
+
+      {/* Bathroom Partition (Present in all layouts, but anchored properly) */}
       <group position={[-width / 2 + (width * 0.3), 0, -length / 2 + (length * 0.15)]}>
-        {/* Bathroom Front Wall */}
-        <mesh castShadow receiveShadow position={[0, 3, length * 0.075]}>
-          <boxGeometry args={[width * 0.3, 6, 0.3]} />
-          <meshStandardMaterial color={wallColor} roughness={0.9} />
-        </mesh>
-        {/* Bathroom Right Side Wall */}
-        <mesh castShadow receiveShadow position={[width * 0.15, 3, -length * 0.075]}>
-          <boxGeometry args={[0.3, 6, length * 0.15]} />
-          <meshStandardMaterial color={wallColor} roughness={0.9} />
-        </mesh>
+        <mesh castShadow receiveShadow position={[0, 3, length * 0.075]}><boxGeometry args={[width * 0.3, 6, 0.3]} /><meshStandardMaterial color={wallColor} roughness={0.9} /></mesh>
+        <mesh castShadow receiveShadow position={[width * 0.15, 3, -length * 0.075]}><boxGeometry args={[0.3, 6, length * 0.15]} /><meshStandardMaterial color={wallColor} roughness={0.9} /></mesh>
       </group>
-
     </group>
   );
 }
